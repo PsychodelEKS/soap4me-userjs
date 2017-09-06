@@ -4,12 +4,12 @@
 // @description Разные улучшалки soap4.me
 // @ujs:category site: enhancements
 // @ujs:published 2015-02-01 23:59:00
-// @ujs:modified 2017-09-06 12:37:39
+// @ujs:modified 2017-09-06 13:31:15
 // @ujs:documentation n/a
 // @ujs:https://github.com/PsychodelEKS/soap4me-userjs/
 // @include http://*soap4.me/*
 // @include https://*soap4.me/*
-// @version 0.1.2
+// @version 0.1.3
 // @updateURL https://github.com/PsychodelEKS/soap4me-userjs/raw/master/soap.enhancer.chrome.user.js
 // @run-at document-end
 // ==/UserScript==
