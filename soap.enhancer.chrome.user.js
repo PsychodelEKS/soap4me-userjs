@@ -4,15 +4,17 @@
 // @description Разные улучшалки soap4.me
 // @ujs:category site: enhancements
 // @ujs:published 2015-02-01 23:59:00
-// @ujs:modified 2017-09-06 18:49:03
+// @ujs:modified 2017-09-06 19:26:33
 // @ujs:documentation n/a
 // @ujs:https://github.com/PsychodelEKS/soap4me-userjs/
 // @include http://*soap4.me/*
 // @include https://*soap4.me/*
-// @version 0.2.1
+// @version 0.2.2
 // @updateURL https://github.com/PsychodelEKS/soap4me-userjs/raw/master/soap.enhancer.chrome.user.js
 // @run-at document-end
+// @grant none
 // ==/UserScript==
+
 
 // version: 0.0.28 (2015-02-05 02:44:17)
 //  - отмечаем эпизод просмотренным после проигрывания 90%
@@ -32,12 +34,8 @@
 //  - переезд на гитхаб
 // version: 0.2 (2017-09-06 18:46:28)
 //  - базовая версия под новый плеер
-
-
-
-// js player api documentation
-// http://playerjs.com/docs/ru=api
-
+// version: 0.2.1 (2017-09-06 19:26:33)
+//  - фикс разрешений
 
 
 function exists(variable) {
@@ -81,7 +79,7 @@ var cge = function () {
     }
 };
 
-(function (window, undefined) {
+var initScript = function (window, undefined) {
     var firstRun = true;
     var nextEpisodeTriggered = false;
 
@@ -96,7 +94,7 @@ var cge = function () {
     window.playerClosed = 0;
 
     // сохраним оригинал
-    var PlayerjsEventsOriginal = PlayerjsEvents;
+    var PlayerjsEventsOriginal = window.PlayerjsEvents;
 
     // оверрайд для дополнительно обработки событий плеера
     window.PlayerjsEvents = function (event, id, info) {
@@ -216,4 +214,6 @@ var cge = function () {
     });
 
     return true;
-})(window);
+};
+
+initScript(window);
