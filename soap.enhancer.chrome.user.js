@@ -4,12 +4,12 @@
 // @description Разные улучшалки soap4.me
 // @ujs:category site: enhancements
 // @ujs:published 2015-02-01 23:59:00
-// @ujs:modified 2017-09-06 13:31:15
+// @ujs:modified 2017-09-06 18:46:28
 // @ujs:documentation n/a
 // @ujs:https://github.com/PsychodelEKS/soap4me-userjs/
 // @include http://*soap4.me/*
 // @include https://*soap4.me/*
-// @version 0.1.3
+// @version 0.2
 // @updateURL https://github.com/PsychodelEKS/soap4me-userjs/raw/master/soap.enhancer.chrome.user.js
 // @run-at document-end
 // ==/UserScript==
@@ -31,127 +31,180 @@
 // version: 0.1.2 (2017-09-06 12:37:58)
 //  - переезд на гитхаб
 
+function exists(variable) {
+    return typeof(variable) != 'undefined';
+}
+
+// var dbgConsole = window.console;
+var dbgConsole = false;
+
+var cl = function (data) {
+    if (dbgConsole) {
+        dbgConsole.log(data);
+    }
+};
+
+var cd = function (data) {
+    if (dbgConsole) {
+        dbgConsole.dir(data);
+    }
+};
+
+var cj = function (data) {
+    cl("\n"+JSON.stringify(data, null, 4));
+};
+
+var cg = function (name) {
+    if (dbgConsole) {
+        dbgConsole.group(name);
+    }
+};
+
+var cgc = function (name, preventInstance) {
+    if (dbgConsole) {
+        dbgConsole.groupCollapsed(name);
+    }
+};
+
+var cge = function () {
+    if (dbgConsole) {
+        dbgConsole.groupEnd();
+    }
+};
+
 (function (window, undefined) {
     var firstRun = true;
+    var nextEpisodeTriggered = false;
 
-    // для открытия html5 плеера по-умолчанию
-    // window.matchProto = String.prototype.match;
-    // String.prototype.match = function (param) {
-    //     if (param == 'inettvbrowser') {
-    //         return true;
-    //     }
-    //     return window.matchProto.apply(this, arguments);
-    // };
+    if (firstRun) {
+        firstRun = false;
+        // дефолтное значение переменной
+        cache['html5_player_go_fullscreen'] = false;
+        cache['html5_player_autoplay']      = false;
+    }
 
     // для автозакрытия плеера после окончания серии
-    window.addEventProto = HTMLDivElement.prototype.addEventListener;
     window.playerClosed = 0;
-    window.customEventsInProgress = false;
 
-    console.log(typeof PlayerjsEvents);
+    // сохраним оригинал
+    var PlayerjsEventsOriginal = PlayerjsEvents;
 
-    return true;
-
-    HTMLDivElement.prototype.addEventListener = function(event, callback, useCapture) {
-        if (!window.customEventsInProgress && typeof Uppod != 'undefined' && event == 'exitfullscreen') {
-            // чтобы изнутри устанавливать обработчики событий exitfullscreen
-            window.customEventsInProgress = true;
-
-            // дефолтное значение переменной
-            cache['html5_player_fullscreen'] = false;
-
-            if (firstRun) {
-                firstRun = false;
-                // дефолтное значение переменной
-                cache['html5_player_go_fullscreen'] = false;
-                cache['html5_player_autoplay']      = false;
-            }
-
-            if ($('#html5').closest('.ep').next().find('div.play.pointer').length) {
-                $('#html5video').after($("<div class='right link'><input type='checkbox' value='1' id='autoplayNext' style='margin-right: 5px;' /><label for='aputoPlayNext'>автопроигрывание</label></div>"));
-                if (cache['html5_player_autoplay']) {
-                    $('#autoplayNext').attr('checked', 'checked');
-                }
-            }
-
-            // автоматическое проигрывание после открытия окна
-            setTimeout(function(){ cache['html5_player'].Play(); }, 250);
-
-            // проверяем каждые 5 секунд, если просмотрено от 90% эпизода - отмечаем просмотренным
-            cache['html5_player_check_interval'] = setInterval(function(){
-                if (cache['html5_player'].Played() >= 95) {
-                    clearInterval(cache['html5_player_check_interval']);
-
-                    // отмечаем просмотренным эпизод
-                    $('#html5').closest('.ep').find('.watched div[data\\:watched="0"]').trigger('click');
-                }
-            }, 5000);
-
-            // проверяем каждые 500 мс секунд, что плеер загрузил видео и проигрывает его
-            cache['html5_player_fullscreen_check_interval'] = setInterval(function(){
-                if (cache['html5_player'].CurrentTime() > 0) {
-                    // если нужно - включим фуллскрин
-                    if (cache['html5_player_go_fullscreen']) {
-                        cache['html5_player_go_fullscreen'] = false;
-
-                        cache['html5_player'].Full();
-                    }
-
-                    clearInterval(cache['html5_player_fullscreen_check_interval']);
-                }
-            }, 500);
-
-            // автоматическое закрытие после окончания проигрывания
-            this.addEventListener('end', function(){
-                // ended вызывается 2 раза почему-то
-                if (window.playerClosed == 0) {
-                    var nextPlayButton     = $('#html5').closest('.ep').next().find('div.play.pointer');
-                    var nextPlayFullscreen = false;
-
-                    if (cache['html5_player_fullscreen']) {
-                        // выходим из полноэкранного
-                        cache['html5_player'].Full();
-
-                        // запоминаем, что надо вернуться в полный экран
-                        nextPlayFullscreen = true;
-                    }
-
-                    // закрываем плеер
-                    setTimeout(function () {
-                        // проверяем настройку автопроигрывания
-                        cache['html5_player_autoplay'] = $('#autoplayNext').is(':checked');
-
-                        $('#player .close').trigger('click');
-
-                        // запускаем следующую серию
-                        if (nextPlayButton && cache['html5_player_autoplay']) {
-                            if (nextPlayFullscreen) {
-                                cache['html5_player_go_fullscreen'] = true;
-                            }
-                            setTimeout(function () {
-                                nextPlayButton.trigger('click');
-                            }, 250);
-                        }
-                    }, 250);
-
-                    window.playerClosed++;
-                } else {
-                    window.playerClosed = 0;
-                }
-            }, false);
-
-            // для корректной работы автозакрытия
-            this.addEventListener('fullscreen', function(){
-                cache['html5_player_fullscreen'] = true;
-            }, false);
-
-            this.addEventListener('exitfullscreen', function(){
-                cache['html5_player_fullscreen'] = false;
-            }, false);
-
-            window.customEventsInProgress = false;
+    // оверрайд для дополнительно обработки событий плеера
+    window.PlayerjsEvents = function (event, id, info) {
+        if (event != 'time') {
+            cl('got event: eid: '+cache['active_eid']+': '+event+(info ? ': '+info : ''));
         }
 
-        return window.addEventProto.apply(this, arguments);
+        if (event == "stop") {
+            cache['html5_player_autoplay'] = $('#autoplayNext').is(':checked');
+
+            if (cache['html5_player_autoplay'] && !nextEpisodeTriggered) {
+                cl('attempt play next');
+
+                if (cache['html5_player_go_fullscreen']) {
+                    // отметим текущий эпизод просмотренным
+                    if (cache["active_eid"]) {
+                        $("div.watched div[data\\:eid="+cache["active_eid"]+"][data\\:watched=0]").click();
+                    }
+
+                    var playerEp = $('#player').closest('.ep');
+
+                    // найдем следующий непросмотреный
+                    var nextEpisodeLink = playerEp.is(":has(div.watched div[data\\:eid="+cache["active_eid"]+"])")
+                                          // если текущий эпизод был первым из плейлиста
+                                          ? playerEp.next().find('div.play.pointer')
+                                          // если текущий эпизод был НЕ первым из плейлиста
+                                          : playerEp.nextAll(".ep:has(div.watched div[data\\:eid="+cache["active_eid"]+"]):first")
+                                                .nextAll('.ep:has(div.watched div[data\\:watched=0]):first')
+                                                .find('div.play.pointer');
+
+                    if (nextEpisodeLink) {
+                        nextEpisodeTriggered = true;
+
+                        var eid     = nextEpisodeLink.attr("data:eid"),
+                            episode = nextEpisodeLink.attr("data:episode"),
+                            sid     = nextEpisodeLink.attr("data:sid"),
+                            hash    = nextEpisodeLink.attr("data:hash");
+
+                        cl('next eid:'+eid);
+
+                        if (eid) {
+                            var hash = $.md5($.token()+eid+sid+hash);
+                            var previousEid = cache["active_eid"];
+                            cache["active_eid"] = eid;
+
+                            $.ajax({
+                                url:      "/api/v2/play/episode/"+eid,
+                                type:     "post",
+                                headers:  {
+                                    "x-api-token":  $.token(),
+                                    "x-user-agent": "browser: public v0.1"
+                                },
+                                data:     {
+                                    eid:  eid,
+                                    hash: hash
+                                },
+                                async:    false,
+                                dataType: "json",
+                                success:  function (json) {
+                                    if (!json.ok) {
+                                        cl('can not get next episode stream url');
+                                        return;
+                                    }
+
+                                    cache["html5_player"+cache['active_eid']] = cache["html5_player"+previousEid];
+                                    cache["html5_player"+cache['active_eid']].api('play', json.stream);
+                                    cache["html5_player"+cache['active_eid']].api('title', json.title);
+
+                                    nextEpisodeTriggered = false;
+                                }
+                            });
+
+                        }
+                    } else {
+                        cl('could not find next episode link');
+                        cache["html5_player"+cache['active_eid']].api('exitfullscreen');
+                    }
+                } else {
+                    $('#html5video').closest('.ep').next().find('div.play.pointer').click();
+                }
+            }
+        }
+
+        if (event == "init") {
+            cl('play on init ('+exists(cache["html5_player"+cache['active_eid']])+')');
+            var initPlayInterval = false;
+
+            initPlayInterval = setInterval(function(){
+                if (exists(cache["html5_player"+cache['active_eid']])) {
+                    clearInterval(initPlayInterval);
+                    initPlayInterval = false;
+                    cl('   playing');
+                    cache["html5_player"+cache['active_eid']].api("play");
+                }
+            }, 50);
+        }
+
+        if (event == "fullscreen") {
+            cache['html5_player_go_fullscreen'] = true;
+        }
+
+        if (event == "exitfullscreen") {
+            cache['html5_player_go_fullscreen'] = false;
+        }
+
+        PlayerjsEventsOriginal(event, id, info);
     };
+
+    $("#episodes .player, #episodes .play, #new .play").click(function(){
+        if ($('#html5video').closest('.ep').next().find('div.play.pointer').length && !$('#html5video').next().is('#autoplayNextDiv')) {
+            $('#html5video').after($(
+                "<div id='autoplayNextDiv' class='right link' style='display: flex;align-items: center;'><input type='checkbox' value='1' id='autoplayNext' style='margin-right: 5px;' /><label for='autoplayNext'>автопроигрывание</label></div>"));
+            if (cache['html5_player_autoplay']) {
+                $('#autoplayNext').attr('checked', 'checked');
+            }
+        }
+    });
+
+    return true;
 })(window);
