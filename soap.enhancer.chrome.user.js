@@ -6,7 +6,7 @@
 // @ujs:published 2015-02-01 23:59:00
 // @ujs:modified 2017-09-06 12:37:39
 // @ujs:documentation n/a
-// @ujs:download n/a
+// @ujs:https://github.com/PsychodelEKS/soap4me-userjs/
 // @include http://*soap4.me/*
 // @include https://*soap4.me/*
 // @version 0.1.2
@@ -47,6 +47,11 @@
     window.addEventProto = HTMLDivElement.prototype.addEventListener;
     window.playerClosed = 0;
     window.customEventsInProgress = false;
+
+    console.log(typeof PlayerjsEvents);
+
+    return true;
+
     HTMLDivElement.prototype.addEventListener = function(event, callback, useCapture) {
         if (!window.customEventsInProgress && typeof Uppod != 'undefined' && event == 'exitfullscreen') {
             // чтобы изнутри устанавливать обработчики событий exitfullscreen
