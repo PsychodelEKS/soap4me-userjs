@@ -4,12 +4,12 @@
 // @description Разные улучшалки soap4.me
 // @ujs:category site: enhancements
 // @ujs:published 2015-02-01 23:59:00
-// @ujs:modified 2017-09-06 18:46:28
+// @ujs:modified 2017-09-06 18:49:03
 // @ujs:documentation n/a
 // @ujs:https://github.com/PsychodelEKS/soap4me-userjs/
 // @include http://*soap4.me/*
 // @include https://*soap4.me/*
-// @version 0.2
+// @version 0.2.1
 // @updateURL https://github.com/PsychodelEKS/soap4me-userjs/raw/master/soap.enhancer.chrome.user.js
 // @run-at document-end
 // ==/UserScript==
@@ -30,6 +30,15 @@
 //  - показываем галку автоплея только если есть чего играть
 // version: 0.1.2 (2017-09-06 12:37:58)
 //  - переезд на гитхаб
+// version: 0.2 (2017-09-06 18:46:28)
+//  - базовая версия под новый плеер
+
+
+
+// js player api documentation
+// http://playerjs.com/docs/ru=api
+
+
 
 function exists(variable) {
     return typeof(variable) != 'undefined';
