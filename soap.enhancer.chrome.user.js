@@ -4,13 +4,13 @@
 // @description Разные улучшалки soap4.me
 // @ujs:category site: enhancements
 // @ujs:published 2015-02-01 23:59:00
-// @ujs:modified 2015-05-18 03:41:28
+// @ujs:modified 2017-09-06 12:37:39
 // @ujs:documentation n/a
 // @ujs:download n/a
 // @include http://*soap4.me/*
 // @include https://*soap4.me/*
 // @version 0.1.2
-// @updateURL https://www.dropbox.com/s/wx4cwtcrwales7i/soap.enhancer.chrome.user.js?dl=1
+// @updateURL https://github.com/PsychodelEKS/soap4me-userjs/raw/master/soap.enhancer.chrome.user.js
 // @run-at document-end
 // ==/UserScript==
 
@@ -28,18 +28,20 @@
 //  - автопроигрывание следующей серии
 // version: 0.1.1 (2015-05-18 01:49:58)
 //  - показываем галку автоплея только если есть чего играть
+// version: 0.1.2 (2017-09-06 12:37:58)
+//  - переезд на гитхаб
 
 (function (window, undefined) {
     var firstRun = true;
 
     // для открытия html5 плеера по-умолчанию
-    window.matchProto = String.prototype.match;
-    String.prototype.match = function (param) {
-        if (param == 'inettvbrowser') {
-            return true;
-        }
-        return window.matchProto.apply(this, arguments);
-    };
+    // window.matchProto = String.prototype.match;
+    // String.prototype.match = function (param) {
+    //     if (param == 'inettvbrowser') {
+    //         return true;
+    //     }
+    //     return window.matchProto.apply(this, arguments);
+    // };
 
     // для автозакрытия плеера после окончания серии
     window.addEventProto = HTMLDivElement.prototype.addEventListener;
