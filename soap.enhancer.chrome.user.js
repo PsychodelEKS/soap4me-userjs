@@ -79,6 +79,17 @@ var cge = function () {
     }
 };
 
+var gtf = function () {
+    var elem = document.getElementsByTagName("video")[0];
+    if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+    } else if (elem.mozRequestFullScreen) {
+        elem.mozRequestFullScreen();
+    } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen();
+    }
+};
+
 var initScript = function (window, undefined) {
     var firstRun = true;
     var nextEpisodeTriggered = false;
@@ -188,6 +199,7 @@ var initScript = function (window, undefined) {
                     initPlayInterval = false;
                     cl('   playing');
                     cache["html5_player"+cache['active_eid']].api("play");
+                    gtf();
                 }
             }, 50);
         }
