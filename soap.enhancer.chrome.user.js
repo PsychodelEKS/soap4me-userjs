@@ -1,6 +1,7 @@
 // ==UserScript==
 // @name Soap enhancer
-// @author PsychodelEKS
+// @author ad
+// @forked-from PsychodelEKS
 // @description Разные улучшалки soap4.me
 // @ujs:category site: enhancements
 // @ujs:published 2015-02-01 23:59:00
@@ -9,7 +10,8 @@
 // @ujs:https://github.com/ad/soap4me-userjs/
 // @include http://*soap4.me/*
 // @include https://*soap4.me/*
-// @version 0.2.2
+// @match https://*soap4.me/soap/*
+// @version 0.3.0
 // @updateURL https://github.com/ad/soap4me-userjs/raw/master/soap.enhancer.chrome.user.js
 // @run-at document-end
 // @grant none
@@ -36,14 +38,16 @@
 //  - базовая версия под новый плеер
 // version: 0.2.2 (2017-09-06 19:26:33)
 //  - фикс разрешений
+// version: 0.3 (2019-04-22 12:58:11)
+//  - Снова всё работает
 
 
 function exists(variable) {
     return typeof(variable) != 'undefined';
 }
 
-// var dbgConsole = window.console;
-var dbgConsole = false;
+var dbgConsole = window.console;
+// var dbgConsole = false;
 
 var cl = function (data) {
     if (dbgConsole) {
@@ -90,6 +94,23 @@ var gtf = function () {
     }
 };
 
+var al = function () {
+    setTimeout(function(){
+        if ($('#html5video').closest('.ep').next().find('.watched .yes').length > 0 && !$('#html5video').next().is('#autoplayNextDiv')) {
+            $('#html5video').after($(
+                "<div id='autoplayNextDiv' class='right link' style='display: flex;align-items: center;'><input type='checkbox' value='1' id='autoplayNext' style='margin-right: 5px;' /><label for='autoplayNext'>автопроигрывание</label></div>"));
+
+            if (localStorage.autoplay) {
+                $('#autoplayNext').attr('checked', 'checked');
+            }
+
+            $("#autoplayNext").click(function() {
+                localStorage.autoplay = $('#autoplayNext').is(':checked');
+            });
+        }
+    }, 500);
+};
+
 var initScript = function (window, undefined) {
     var firstRun = true;
     var nextEpisodeTriggered = false;
@@ -97,8 +118,8 @@ var initScript = function (window, undefined) {
     if (firstRun) {
         firstRun = false;
         // дефолтное значение переменной
-        cache['html5_player_go_fullscreen'] = false;
-        cache['html5_player_autoplay']      = false;
+        // cache['html5_player_go_fullscreen'] = false;
+        // cache['html5_player_autoplay']      = false;
     }
 
     // для автозакрытия плеера после окончания серии
@@ -113,13 +134,18 @@ var initScript = function (window, undefined) {
             cl('got event: eid: '+cache['active_eid']+': '+event+(info ? ': '+info : ''));
         }
 
-        if (event == "stop") {
-            cache['html5_player_autoplay'] = $('#autoplayNext').is(':checked');
+        if (event == "play") {
+            al();
+        }
 
-            if (cache['html5_player_autoplay'] && !nextEpisodeTriggered) {
+        if (event == "end") {
+            // cache['html5_player_autoplay']
+            localStorage.autoplay = $('#autoplayNext').is(':checked');
+
+            if (localStorage.autoplay && !nextEpisodeTriggered) {
                 cl('attempt play next');
 
-                if (cache['html5_player_go_fullscreen']) {
+                if (localStorage.fullscreen) {
                     // отметим текущий эпизод просмотренным
                     if (cache["active_eid"]) {
                         $("div.watched div[data\\:eid="+cache["active_eid"]+"][data\\:watched=0]").click();
@@ -133,7 +159,7 @@ var initScript = function (window, undefined) {
                                           ? playerEp.next().find('div.play.pointer')
                                           // если текущий эпизод был НЕ первым из плейлиста
                                           : playerEp.nextAll(".ep:has(div.watched div[data\\:eid="+cache["active_eid"]+"]):first")
-                                                .nextAll('.ep:has(div.watched div[data\\:watched=0]):first')
+                                                .nextAll('.ep:has(div.watched div[data\\:wastched=0]):first')
                                                 .find('div.play.pointer');
 
                     if (nextEpisodeLink) {
@@ -147,7 +173,7 @@ var initScript = function (window, undefined) {
                         cl('next eid:'+eid);
 
                         if (eid) {
-                            var hash = $.md5($.token()+eid+sid+hash);
+                            hash = $.md5($.token()+eid+sid+hash);
                             var previousEid = cache["active_eid"];
                             cache["active_eid"] = eid;
 
@@ -199,30 +225,32 @@ var initScript = function (window, undefined) {
                     initPlayInterval = false;
                     cl('   playing');
                     cache["html5_player"+cache['active_eid']].api("play");
-                    gtf();
+                    setTimeout(function(){
+                        cache["html5_player"+cache['active_eid']].api("unmute");
+                    }, 500);
+                    if (localStorage.fullscreen) {
+                        setTimeout(function(){
+                            cache["html5_player"+cache['active_eid']].api("fullscreen");
+                            gtf();
+                        }, 1000);
+                    }
                 }
             }, 50);
         }
 
         if (event == "fullscreen") {
-            cache['html5_player_go_fullscreen'] = true;
+            localStorage.fullscreen = true;
         }
 
         if (event == "exitfullscreen") {
-            cache['html5_player_go_fullscreen'] = false;
+            localStorage.fullscreen = false;
         }
 
         PlayerjsEventsOriginal(event, id, info);
     };
 
     $("#episodes .player, #episodes .play, #new .play").click(function(){
-        if ($('#html5video').closest('.ep').next().find('div.play.pointer').length && !$('#html5video').next().is('#autoplayNextDiv')) {
-            $('#html5video').after($(
-                "<div id='autoplayNextDiv' class='right link' style='display: flex;align-items: center;'><input type='checkbox' value='1' id='autoplayNext' style='margin-right: 5px;' /><label for='autoplayNext'>автопроигрывание</label></div>"));
-            if (cache['html5_player_autoplay']) {
-                $('#autoplayNext').attr('checked', 'checked');
-            }
-        }
+        al()
     });
 
     return true;
