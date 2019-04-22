@@ -11,7 +11,7 @@
 // @include http://*soap4.me/*
 // @include https://*soap4.me/*
 // @match https://*soap4.me/soap/*
-// @version 0.3.0
+// @version 0.3.1
 // @updateURL https://github.com/ad/soap4me-userjs/raw/master/soap.enhancer.chrome.user.js
 // @run-at document-end
 // @grant none
@@ -38,7 +38,7 @@
 //  - базовая версия под новый плеер
 // version: 0.2.2 (2017-09-06 19:26:33)
 //  - фикс разрешений
-// version: 0.3 (2019-04-22 12:58:11)
+// version: 0.3.1 (2019-04-22 12:58:11)
 //  - Снова всё работает
 
 
@@ -159,7 +159,7 @@ var initScript = function (window, undefined) {
                                           ? playerEp.next().find('div.play.pointer')
                                           // если текущий эпизод был НЕ первым из плейлиста
                                           : playerEp.nextAll(".ep:has(div.watched div[data\\:eid="+cache["active_eid"]+"]):first")
-                                                .nextAll('.ep:has(div.watched div[data\\:wastched=0]):first')
+                                                .nextAll('.ep:has(div.watched div[data\\:watched=0]):first')
                                                 .find('div.play.pointer');
 
                     if (nextEpisodeLink) {
