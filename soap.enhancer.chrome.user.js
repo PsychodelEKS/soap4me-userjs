@@ -11,7 +11,8 @@
 // @include http://*soap4.me/*
 // @include https://*soap4.me/*
 // @match https://*soap4.me/soap/*
-// @version 0.3.1
+// @match https://*soap4youand.me/soap/*
+// @version 0.3.2
 // @updateURL https://github.com/PsychodelEKS/soap4me-userjs/raw/master/soap.enhancer.chrome.user.js
 // @run-at document-end
 // @grant none
