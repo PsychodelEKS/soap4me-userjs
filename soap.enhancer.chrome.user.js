@@ -1,18 +1,18 @@
 // ==UserScript==
 // @name Soap enhancer
-// @author ad
-// @forked-from PsychodelEKS
+// @author PsychodelEKS
+// @contributor Daniel Apatin (https://github.com/ad/)
 // @description Разные улучшалки soap4.me
 // @ujs:category site: enhancements
 // @ujs:published 2015-02-01 23:59:00
 // @ujs:modified 2019-04-22 12:58:11
 // @ujs:documentation n/a
-// @ujs:https://github.com/ad/soap4me-userjs/
+// @ujs:https://github.com/PsychodelEKS/soap4me-userjs/
 // @include http://*soap4.me/*
 // @include https://*soap4.me/*
 // @match https://*soap4.me/soap/*
 // @version 0.3.1
-// @updateURL https://github.com/ad/soap4me-userjs/raw/master/soap.enhancer.chrome.user.js
+// @updateURL https://github.com/PsychodelEKS/soap4me-userjs/raw/master/soap.enhancer.chrome.user.js
 // @run-at document-end
 // @grant none
 // ==/UserScript==
@@ -96,15 +96,18 @@ var gtf = function () {
 
 var al = function () {
     setTimeout(function(){
-        if ($('#html5video').closest('.ep').next().find('.watched .yes').length > 0 && !$('#html5video').next().is('#autoplayNextDiv')) {
-            $('#html5video').after($(
-                "<div id='autoplayNextDiv' class='right link' style='display: flex;align-items: center;'><input type='checkbox' value='1' id='autoplayNext' style='margin-right: 5px;' /><label for='autoplayNext'>автопроигрывание</label></div>"));
+        if ($('#html5video').closest('.ep').next().find('.watched .yes').length > 0
+            && !$('#html5video').next().is('#autoplayNextDiv')
+        ) {
+            $('#html5video').after(
+                $("<div id='autoplayNextDiv' class='right link' style='display: flex;align-items: center;'><input type='checkbox' value='1' id='autoplayNext' style='margin-right: 5px;' /><label for='autoplayNext'>автопроигрывание</label></div>")
+            );
 
             if (localStorage.autoplay) {
                 $('#autoplayNext').attr('checked', 'checked');
             }
 
-            $("#autoplayNext").click(function() {
+            $("#autoplayNext").click(function () {
                 localStorage.autoplay = $('#autoplayNext').is(':checked');
             });
         }
