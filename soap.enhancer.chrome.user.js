@@ -5,7 +5,7 @@
 // @description Разные улучшалки soap4.me
 // @ujs:category site: enhancements
 // @ujs:published 2015-02-01 23:59:00
-// @ujs:modified 2019-04-22 12:58:11
+// @ujs:modified 2022-05-30 11:22:37
 // @ujs:documentation n/a
 // @ujs:https://github.com/PsychodelEKS/soap4me-userjs/
 // @include http://*soap4.me/*
